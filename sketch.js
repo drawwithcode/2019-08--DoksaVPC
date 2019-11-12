@@ -2,7 +2,7 @@
 var myMap;
 //declaring the variable for the canvas
 var canvas;
-//declaring and creating a new Mappa object using mapbox
+//declaring and creating a new Mappa object and making it use mapbox
 var mappa = new Mappa(
   "MapboxGL",
   "pk.eyJ1IjoiZG9rc2F2cGMiLCJhIjoiY2sybTUxeXJnMGQycjNqbjVrYjE5dmg3YyJ9.n7CmQCAd4zSI0VxLgEb4DA"
@@ -11,14 +11,14 @@ var mappa = new Mappa(
 var myPosition;
 var myLat;
 var myLon;
-//declaring the elements for the country selection (a container div, a text and a selection element)
+//declaring the elements for the country selection (a container div, a title and a selection element)
 var selDiv;
 var selText;
 var sel;
 //declaring the variables for latitude and longitude of the selected country's capital
 var capitalLat;
 var capitalLon;
-//declaring the variable for the json file
+//declaring the variable for the data from the json file
 var data;
 //declaring the variable for the index number of the selected country, this will be helpful to return the capital of the selected country
 var selIndex;
@@ -29,7 +29,7 @@ var options = {
   zoom: 2,
   style: "mapbox://styles/doksavpc/ck2wcr5860thl1ctmmn6h39su"
 };
-//preloading the data about the countries and capitals
+//preloading the data about the countries and their capitals
 function preload() {
   data = loadJSON("./assets/country-capitals.json");
 }
@@ -38,9 +38,9 @@ function setup() {
   //creating the canvas
   canvas = createCanvas(windowWidth, windowHeight);
   ellipseMode(CENTER);
-  //getting the user position using the geolocation
+  //getting the user coordinates using the geolocation
   myPosition = getCurrentPosition();
-  //creating the map and makeing it overlay the canvas
+  //creating the map and making it overlay the canvas
   myMap = mappa.tileMap(options);
   myMap.overlay(canvas);
   //creating and styling the html elements for the country selection (a container div, a title and the selection input)
@@ -54,8 +54,8 @@ function setup() {
   selText = createElement("h1", "Select a Country");
   selText.parent(selDiv);
   sel = createSelect();
-  sel.id("mySelect");
-  //creating an option for every country stored in the json file in the selection input
+  sel.id("countrySelect");
+  //creating an option in the selection input for every country stored in the json file
   for (var i = 0; i < data.countries.length; i++) {
     sel.option(data.countries[i].CountryName);
   }
@@ -64,11 +64,12 @@ function setup() {
 
 function draw() {
   clear();
-  //getting the index number from the selected option, in order to get the data of the capital according to the country
-  var selIndex = document.getElementById("mySelect").selectedIndex;
+  //getting the index number of the selected option, in order to get the name and the coordinates of the capital according to the selected country
+  var selIndex = document.getElementById("countrySelect").selectedIndex;
+  //latitude and longitude of the selected country's capital
   capitalLat = data.countries[selIndex].CapitalLatitude;
   capitalLon = data.countries[selIndex].CapitalLongitude;
-  //setting the latitude and longitude of the user
+  //putting the latitude and longitude of the user in two variables
   myLat = myPosition.latitude;
   myLon = myPosition.longitude;
   //mapping latitude and longitude of user and capital into pixel dimensionss
@@ -87,6 +88,7 @@ function draw() {
   ellipse(me.x, me.y, 25);
   ellipse(capital.x, capital.y, 25);
   pop();
+  push();
   textAlign(CENTER);
   textSize(20);
   fill(50);
@@ -94,4 +96,5 @@ function draw() {
   text(data.countries[selIndex].CapitalName, capital.x, capital.y - 20);
   text("You", me.x, me.y - 20);
   text(distance + " km", (me.x + capital.x) / 2, (me.y + capital.y) / 2 - 20);
+  pop();
 }
